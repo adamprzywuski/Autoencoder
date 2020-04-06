@@ -2,7 +2,8 @@ from tensorflow.keras.models import Model
 from tensorflow.keras.layers import Input,Dense
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.utils import to_categorical
-import tensorflow
+import tensorflow.keras as keras
+import tensorflow.keras.layers as layers
 from sklearn.datasets import load_digits
 from sklearn.model_selection import train_test_split
 import matplotlib.pyplot as plt
@@ -17,10 +18,10 @@ def zad1():
     print("The database has " + str(len(database.images)))
     print(database["target"])
 
-    x = random.randint(0, 1000)
-    print(x)
-    for a in range(0, 10):
 
+
+    for a in range(0, 10):
+        x = random.randint(0, 1000)
         b = 0
         while (database.target[x + a + b] != a):
             b = b + 1
@@ -37,8 +38,6 @@ def zad1():
     plt.show()
 
 def zad2():
-
-
 
     x_train,x_test,y_train,y_test=train_test_split(database.data,database.target,test_size=0.2)
 
@@ -61,7 +60,73 @@ def zad2():
     loss= net_model.evaluate(x_test, y_test)
     print(loss)
 
+    x=random.randint(0,100)
+    prediction=net_model.predict(x_test)
+
+    for layer in net_model.layers:
+        weights=layer.get_weights()
+        print(weights)
+        print("----------")
+
+
+def zad3():
+    x_train,x_test=train_test_split(database.data,test_size=0.2)
+
+    x_train = x_train.astype('float32') / 255.
+    x_test = x_test.astype('float32') / 255.
+
+    input_layer=Input(shape=(64))
+    encoded=Dense(5,activation='relu')(input_layer)
+    decoded=Dense(64,activation='sigmoid')(encoded)
+
+    autoencoder=Model(input_layer,decoded)
+
+
+
+    encoded_input=Input(shape=(10,))
+
+    decoded_layer=autoencoder.layers[-1]
+
+
+    autoencoder.compile(optimizer=Adam(),loss="mse")
+
+    autoencoder.fit(x_train,x_train,validation_data=(x_test,x_test),epochs=100)
+
+    (loss) = autoencoder.evaluate(x_train, x_train, verbose=0)
+    print(loss)
+
+
+
+    weights=autoencoder.get_weights()
+    for a in weights:
+        print(a.shape)
+
+
+
+    #Creating encoder
+    encoder=Model(inputs=input_layer,outputs=encoded)
+    encoder.compile(optimizer=Adam(), loss="mse")
+
+
+    #Creating embbaings value
+    encoded_train = encoder.predict(x_train)
+    encoded_test = encoder.predict(x_test)
+    print(encoded_train)
+
+    #Creating decoder
+    input_layer2=Input(5)
+    encoded_layer=Dense(64,activation='relu')(input_layer2)
+    decoder=Model(input_layer2,encoded_layer)
+    decoder.compile(optimizer=Adam(), loss="mse")
+    decoder.fit(encoded_train,x_train,epochs=100)
+
+
+
+
+
+
+
 
 
 if __name__ == '__main__':
-    zad2()
+    zad3()
