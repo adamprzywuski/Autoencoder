@@ -68,9 +68,26 @@ def zad2():
         print(weights)
         print("----------")
 
+def displaying_value(array):
+    plt.gray()
+    buffer=[]
+    i=0
+
+    for b in range(0,8):
+        arrbuff = []
+        for c in range(0,8):
+
+
+            arrbuff.append(array[i])
+            i=i+1
+        buffer.append(arrbuff)
+    print(buffer)
+    #plt.imshow(np.reshape(array (8, 8)), cmap=plt.cm.gray_r)
+    plt.matshow(buffer)
+    plt.show()
 
 def zad3():
-    x_train,x_test=train_test_split(database.data,test_size=0.2)
+    x_train,x_test,y_train,y_test=train_test_split(database.data,database.target,test_size=0.2)
 
     x_train = x_train.astype('float32') / 255.
     x_test = x_test.astype('float32') / 255.
@@ -120,6 +137,18 @@ def zad3():
     decoder.compile(optimizer=Adam(), loss="mse")
     decoder.fit(encoded_train,x_train,epochs=100)
 
+    predictions_values=decoder.predict(encoded_train)
+    print(predictions_values[100])
+    displaying_value(predictions_values[100])
+    displaying_value(x_test[100])
+
+
+
+
+
+
+
+
 
 
 
@@ -129,4 +158,5 @@ def zad3():
 
 
 if __name__ == '__main__':
+    print(database.target[100])
     zad3()
