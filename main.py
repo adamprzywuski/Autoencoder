@@ -16,8 +16,9 @@ def zad1():
     plt.gray()
     # print(database)
     print("The database has " + str(len(database.images)))
-    print(database["target"])
-
+    #print(database["target"])
+    print(database.images[1].shape)
+    print(database.images[1].size)
 
 
     for a in range(0, 10):
@@ -25,7 +26,7 @@ def zad1():
         b = 0
         while (database.target[x + a + b] != a):
             b = b + 1
-        plt.matshow(database.images[x + a])
+        #plt.matshow(database.images[x + a+b])
         print(database.target[x + a + b])
 
     # plt.show()
@@ -34,39 +35,42 @@ def zad1():
     array = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     for a in range(0, 1797):
         array[database.target[a]] = array[database.target[a]] + 1
+    plt.xticks(range(10))
     plt.hist(database.target)
+
     plt.show()
 
 def zad2():
-
+    #creating data to input,output,training,testing
     x_train,x_test,y_train,y_test=train_test_split(database.data,database.target,test_size=0.2)
-
+    #to get output to the categorical
     y_train=to_categorical(y_train)
     y_test=to_categorical(y_test)
 
-
+    #creating input layer
     input_layer=Input(shape=(64))
-
+    #creating output layer
     dense_layer=Dense(10,activation='sigmoid')(input_layer)
+
+    #creating model
     net_model=Model(inputs=input_layer,outputs=dense_layer)
     net_model.compile(loss='mse',optimizer=Adam())
 
 
-
+    #training the data
     net_model.fit(x_train,y_train,validation_data=(x_test,y_test),epochs=100)
 
-
+    #Testing data
     print("TESTING")
     loss= net_model.evaluate(x_test, y_test)
     print(loss)
 
     x=random.randint(0,100)
     prediction=net_model.predict(x_test)
+    print(prediction[x])
 
-    for layer in net_model.layers:
-        weights=layer.get_weights()
-        print(weights)
-        print("----------")
+
+
 
 def displaying_value(array):
     plt.gray()
@@ -82,38 +86,31 @@ def displaying_value(array):
             i=i+1
         buffer.append(arrbuff)
     print(buffer)
-    #plt.imshow(np.reshape(array (8, 8)), cmap=plt.cm.gray_r)
+   # plt.imshow(np.reshape(array (8, 8)), cmap=plt.cm.gray_r)
     plt.matshow(buffer)
-    plt.show()
+
 
 def zad3():
+    #Preparing data
     x_train,x_test,y_train,y_test=train_test_split(database.data,database.target,test_size=0.2)
-
     x_train = x_train.astype('float32') / 255.
     x_test = x_test.astype('float32') / 255.
-
+    #Creating input data
     input_layer=Input(shape=(64))
+    #Creating others layers
     encoded=Dense(5,activation='relu')(input_layer)
     decoded=Dense(64,activation='sigmoid')(encoded)
-
+    #Creating model
     autoencoder=Model(input_layer,decoded)
-
-
-
-    encoded_input=Input(shape=(10,))
-
-    decoded_layer=autoencoder.layers[-1]
-
-
     autoencoder.compile(optimizer=Adam(),loss="mse")
-
+    #Training model
     autoencoder.fit(x_train,x_train,validation_data=(x_test,x_test),epochs=100)
-
+    #Testing
     (loss) = autoencoder.evaluate(x_train, x_train, verbose=0)
     print(loss)
 
 
-
+    #Printing values of layers
     weights=autoencoder.get_weights()
     for a in weights:
         print(a.shape)
@@ -138,9 +135,10 @@ def zad3():
     decoder.fit(encoded_train,x_train,epochs=100)
 
     predictions_values=decoder.predict(encoded_train)
-    print(predictions_values[100])
-    displaying_value(predictions_values[100])
-    displaying_value(x_test[100])
+    x=random.randint(0,100)
+    displaying_value(predictions_values[x])
+    displaying_value(x_test[x])
+    plt.show()
 
 
 
